@@ -1,0 +1,26 @@
+{
+   "name": "y",
+   "version": "1.0.0",
+   "description": "A darts scoring web app for playing online matches against your friends.",
+   "main": "index.js",
+   "dependencies": {
+      "express": "^4.17.1",
+      "nodemon": "^2.0.7",
+      "socketio": "^1.0.0"
+   },
+   "devDependencies": {},
+   "scripts": {
+      "start": "node index.js",
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/ErykBrol/DartsBuddy.git"
+   },
+   "author": "",
+   "license": "ISC",
+   "bugs": {
+      "url": "https://github.com/ErykBrol/DartsBuddy/issues"
+   },
+   "homepage": "https://github.com/ErykBrol/DartsBuddy#readme"
+}
