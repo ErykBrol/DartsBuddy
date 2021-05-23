@@ -48,7 +48,7 @@ X01Schema.virtual('config').set(function (config) {
       p1: config.p1,
       p2: config.p2,
       startingScore: config.startingScore,
-      startingScore: config.startingScore,
+      startingPlayer: config.startingPlayer,
    });
 });
 
