@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const requireLogin = require('../services/requireLogin');
 const UserController = require('../controllers/userController');
 
 /**
@@ -15,8 +16,8 @@ const UserController = require('../controllers/userController');
  */
 router.post('/register', UserController.registerUser);
 router.get('/:user_id', UserController.getUser);
-router.delete('/:user_id', UserController.deleteUser);
-router.patch('/:user_id', UserController.updateUser);
+router.delete('/:user_id', requireLogin, UserController.deleteUser);
+router.patch('/:user_id', requireLogin, UserController.updateUser);
 router.get('/:user_id/stats', UserController.getStats);
 router.get('/:user_id/games', UserController.getGames);
 

@@ -1,3 +1,6 @@
+const User = require('../models/User');
+const bcrypt = require('bcrypt');
+
 let UserController = {
    registerUser: async (req, res) => {
       const userExists = await User.findOne({ username: req.body.username }).catch((err) => {
@@ -37,7 +40,7 @@ let UserController = {
    deleteUser: async (req, res) => {
       // A user can only delete themselves
       if (req.user._id !== req.params.user_id) {
-         return res.status(401).send({ msg: 'Unauthorized to delete this user', err });
+         return res.status(401).send({ msg: 'Unauthorized to delete this user' });
       }
       await User.findByIdAndDelete(req.params.user_id).catch((err) => {
          return res.status(500).send({ msg: 'Error deleting user', err });
@@ -46,8 +49,8 @@ let UserController = {
    },
    updateUser: async (req, res) => {
       // A user can only update their own profile
-      if (req.user._id !== req.params.user_id) {
-         return res.status(401).send({ msg: 'Unauthorized to modify this user', err });
+      if (req.user._id != req.params.user_id) {
+         return res.status(401).send({ msg: 'Unauthorized to modify this user' });
       }
       await User.findByIdAndUpdate(
          req.params.user_id,

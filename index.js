@@ -6,9 +6,19 @@ const io = require('socket.io')(server);
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const path = require('path');
+const mongoose = require('mongoose');
 
-/* Import config */
+/* Import configs */
 const keys = require('./config/keys');
+require('./services/passport');
+
+/* Connect to DB */
+mongoose.connect(keys.mongoURI, {
+   useNewUrlParser: true,
+   useUnifiedTopology: true,
+   useFindAndModify: false,
+   useCreateIndex: true,
+});
 
 /* Import routes */
 const authRoutes = require('./routes/authRoutes');
@@ -28,8 +38,8 @@ app.use(passport.session());
 
 /* Route middleware */
 app.use('/auth', authRoutes);
-app.use('/users', authRoutes);
-app.use('/games', authRoutes);
+app.use('/users', userRoutes);
+app.use('/games', gameRoutes);
 
 /* Production logic for serving content (future React frontend) */
 if (process.env.NODE_ENV === 'production') {
