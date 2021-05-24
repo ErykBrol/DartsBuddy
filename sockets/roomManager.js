@@ -19,12 +19,15 @@ let roomManager = (server) => {
          console.log('Create room with id: ' + roomId);
       });
 
-      socket.on('joinRoom', (roomId) => {
+      socket.on('joinRoom', (data) => {
+         const roomId = data.roomId;
+         const userId = data.userId;
          const room = rooms[roomId];
          if (room) {
             socket.join(roomId);
-            room.joinRoom(roomId);
-            console.log('Client ' + socket.id + 'joined room with id: ' + roomId);
+            room.joinRoom(roomId, userId);
+            console.log('Client ' + socket.id + ' joined room with id: ' + roomId);
+            socket.emit('roomJoined', roomId);
          } else {
             socket.emit('err', { msg: "Room doesn't exist" });
          }
@@ -35,8 +38,13 @@ let roomManager = (server) => {
          delete rooms[socket.id];
       });
 
-      socket.on('play', (score) => {
-         console.log('Client ' + socket.id + ' scored ' + score);
+      socket.on('play', (data) => {
+         const room = rooms[data.roomId];
+         if (room) {
+            room.play(data);
+         } else {
+            socket.emit('err', { msg: "Room doesn't exist" });
+         }
       });
    });
 };
