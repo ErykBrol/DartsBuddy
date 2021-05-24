@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-const io = require('socket.io')(server);
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const path = require('path');
@@ -11,6 +10,9 @@ const mongoose = require('mongoose');
 /* Import configs */
 const keys = require('./config/keys');
 require('./services/passport');
+
+/* Connect to socket manager */
+require('./sockets/roomManager')(server);
 
 /* Connect to DB */
 mongoose.connect(keys.mongoURI, {
@@ -50,5 +52,9 @@ if (process.env.NODE_ENV === 'production') {
       res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
    });
 }
+
+app.get('/', (req, res) => {
+   res.sendFile('E:\\git_workspace\\DartsBuddy\\DartsBuddy\\client\\index.html');
+});
 
 server.listen(keys.port);
