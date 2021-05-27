@@ -12,7 +12,7 @@ const keys = require('./config/keys');
 require('./services/passport');
 
 /* Connect to socket manager */
-require('./sockets/roomManager')(server);
+require('./sockets/socketService')(server);
 
 /* Connect to DB */
 mongoose.connect(keys.mongoURI, {

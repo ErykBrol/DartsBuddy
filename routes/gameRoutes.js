@@ -9,12 +9,12 @@ const GameController = require('../controllers/gameController');
  *
  * GET /games?type_id       - Get all games, if type_id is passed, find only games with this type_id
  * GET /games/:game_id      - Get the game with this id
- * POST /games/:type_id     - Create a game of this type, must pass in type of game and date created
+ * POST /games/:type        - Create a game of this type, requires a gameConfig object to init the game with
  * DEL /games/:game_id      - Delete the game with this id (useful for cancelling a game)
  */
 router.get('/', GameController.getGames);
 router.get('/:game_id', GameController.getGameById);
-router.post('/games/:type_id', requireLogin, GameController.createGame);
+router.post('/:type', GameController.createGame);
 router.delete('/:game_id', requireLogin, GameController.deleteGame);
 
 module.exports = router;

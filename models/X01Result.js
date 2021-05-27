@@ -1,20 +1,18 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const Game = require('../models/Game');
+const GameResult = require('./GameResult');
 
-const X01Schema = new Schema({
+const X01ResultSchema = new Schema({
    p1: {
       type: String,
-      required: true,
    },
    p2: {
       type: String,
-      required: true,
    },
    startingScore: {
       type: Number,
-      default: 501,
+      required: true,
    },
    startingPlayer: {
       type: String,
@@ -22,43 +20,36 @@ const X01Schema = new Schema({
    },
    winner: {
       type: String,
-      required: true,
    },
    p1ThreeDartAvg: {
       type: Number,
-      required: true,
    },
    p2ThreeDartAvg: {
       type: Number,
-      required: true,
    },
    p1FirstNineAvg: {
       type: Number,
-      required: true,
    },
    p2FirstNineAvg: {
       type: Number,
-      required: true,
    },
 });
 
-// Used to set the config for this game easily
-X01Schema.virtual('config').set(function (config) {
-   this.set({
-      p1: config.p1,
-      p2: config.p2,
-      startingScore: config.startingScore,
-      startingPlayer: config.startingPlayer,
-   });
+// Used to get the config for this game easily
+X01ResultSchema.virtual('config').get(function () {
+   return {
+      startingScore: this.startingScore,
+      startingPlayer: this.startingPlayer,
+   };
 });
 
 // Used to get an array of game's players easily
-X01Schema.virtual('players').get(function () {
+X01ResultSchema.virtual('players').get(function () {
    return [this.p1, this.p2];
 });
 
 // Used to get this game's stats easily
-X01Schema.virtual('stats').get(function () {
+X01ResultSchema.virtual('stats').get(function () {
    return {
       winner: this.winner,
       p1ThreeDartAvg: this.p1ThreeDartAvg,
@@ -68,4 +59,4 @@ X01Schema.virtual('stats').get(function () {
    };
 });
 
-module.exports = Game.discriminator('games', X01Schema);
+module.exports = GameResult.discriminator('X01Results', X01ResultSchema);
