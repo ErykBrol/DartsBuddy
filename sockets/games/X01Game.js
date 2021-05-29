@@ -2,7 +2,7 @@ module.exports = class X01Game {
    constructor(gameConfig) {
       this.p1 = null;
       this.p2 = null;
-      this.numLegs = gameConfig.numLegs;
+      this.numLegsToWin = gameConfig.numLegsToWin;
       this.startingScore = gameConfig.startingScore;
       this.gameState = {
          p1Score: gameConfig.startingScore,
@@ -15,7 +15,6 @@ module.exports = class X01Game {
          p2LegsWon: 0,
       };
       this.stats = {
-         legWinners: [], // Array storing playerID of each leg
          p1TotalScored: 0,
          p2TotalScored: 0,
          p1DartsThrown: 0,
@@ -23,6 +22,7 @@ module.exports = class X01Game {
          p1ThreeDartAvg: 0,
          p2ThreeDartAvg: 0,
       };
+      this.error = null;
    }
 
    /**
@@ -69,18 +69,15 @@ module.exports = class X01Game {
 
       if (this._isLegOver()) {
          this._handleLegOver();
-      } else {
-         this._swapTurns();
-         console.log("It's now " + this.gameState.turn + "'s turn");
       }
    }
 
    saveGame(gameResult) {
       gameResult.completed = true;
-      gameResult.p1 = game.p1;
-      gameResult.p2 = game.p2;
-      gameResult.matchWinner = game.gameState.matchWinner;
-      gameResult.stats = game.stats;
+      gameResult.p1 = this.p1;
+      gameResult.p2 = this.p2;
+      gameResult.winner = this.gameState.winner;
+      gameResult.stats = this.stats;
    }
 
    _isLegOver() {
@@ -93,17 +90,14 @@ module.exports = class X01Game {
    _handleLegOver() {
       // Figure out who won the leg & store the result
       if (this.gameState.p1Score === 0) {
-         this.gameState.legWinners.push(this.p1);
          this.gameState.p1LegsWon++;
       } else {
-         this.gameState.legWinners.push(this.p2);
          this.gameState.p2LegsWon++;
       }
 
-      if (this.gameState.currentLeg === this.numLegs) {
+      if (this.gameState.p1LegsWon === this.numLegsToWin || this.gameState.p2LegsWon === this.numLegsToWin) {
          this._handleMatchOver();
       } else {
-         this._swapTurns();
          console.log(
             'Game shot in leg #' + this.gameState.currentLeg + '. ' + this.gameState.turn + ' to throw first, game on!'
          );
@@ -117,7 +111,7 @@ module.exports = class X01Game {
    _handleMatchOver() {
       this.gameState.gameOver = true;
 
-      if (this.gameState.p1LegsWon > this.gameState.p2LegsWon) {
+      if (this.gameState.p1LegsWon === this.numLegsToWin) {
          this.gameState.matchWinner = this.p1;
       } else {
          this.gameState.matchWinner = this.p2;
@@ -129,7 +123,7 @@ module.exports = class X01Game {
    _scoreVisit(data) {
       let score = parseInt(data.score, 10);
       if (score > 180 || score < 0) {
-         // TODO: error
+         this.error = { msg: 'Score must be in the range of 0-180' };
       } else {
          if (this.gameState.turn == this.p1) {
             // this.stats.p1DartsThrown += data.dartsThrown;
@@ -158,6 +152,7 @@ module.exports = class X01Game {
             }
             // this.stats.p1ThreeDartAvg = (this.stats.p1TotalScored / this.stats.p1DartsThrown) * 3;
          }
+         this._swapTurns();
       }
    }
 
@@ -167,5 +162,6 @@ module.exports = class X01Game {
       } else {
          this.gameState.turn = this.p1;
       }
+      console.log("It's now " + this.gameState.turn + "'s turn");
    }
 };

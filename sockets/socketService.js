@@ -44,7 +44,7 @@ let SocketService = (server) => {
                socket.emit(ERROR_ACTION, { msg: 'Error joining game' });
             }
             if (game.shouldStart()) {
-               io.to(roomId).emit(START_GAME_ACTION, game.turn);
+               io.to(roomId).emit(START_GAME_ACTION, game.gameState);
             }
          } else {
             socket.emit(ERROR_ACTION, { msg: "Room doesn't exist" });
@@ -56,8 +56,16 @@ let SocketService = (server) => {
 
          if (game) {
             game.play(data);
+
+            // Check for any errors as a result of taking a turn
+            if (game.error) {
+               io.to(data.roomId).emit(ERROR_ACTION, game.error);
+               game.error = null;
+            }
+
+            // Check to see if the game has ended
             if (game.gameState.gameOver) {
-               saveGame(rooms[data.roomId]);
+               saveGameResult(rooms[data.roomId]);
                io.to(data.roomId).emit(GAME_OVER_ACTION, game.gameState);
             } else {
                io.to(data.roomId).emit(UPDATE_GAME_ACTION, game.gameState);
@@ -78,12 +86,11 @@ function createGame(gameType, gameConfig) {
    }
 }
 
-async function saveGame(room) {
+async function saveGameResult(room) {
    let gameResult = room.gameResult;
    let game = room.game;
 
-   // Call the game's saveGame method to save whatever specific the game
-   // needs to save
+   // Call the game's saveGame method to save whatever specific the game needs to save
    game.saveGame(gameResult);
 
    try {

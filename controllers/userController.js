@@ -67,12 +67,6 @@ let UserController = {
       });
       return res.send(user.stats);
    },
-   getGames: async (req, res) => {
-      const user = await User.findById(req.params.user_id).catch((err) => {
-         return res.status(500).send({ msg: 'Error fetching user', err });
-      });
-      return res.status(200).send(user.pastGames);
-   },
 };
 
 module.exports = UserController;
