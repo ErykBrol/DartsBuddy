@@ -20,17 +20,21 @@ let SocketService = (server) => {
          const roomId = data.roomId;
          const userId = data.userId;
 
-         // Find the GameResult entry created with this roomId
-         const gameResult = await GameResult.findOne({ roomId }).catch((err) => {
+         // Find the GameResult entry created with this roomId, only want not complete ones to avoid collisions
+         // with previous games that shared this roomID
+         const gameResult = await GameResult.findOne({ roomId, completed: false }).catch((err) => {
             console.log("ERROR: couldn't find the game");
             socket.emit(ERROR_ACTION, { msg: 'Error finding game with this roomId' });
          });
 
          if (gameResult) {
             if (!rooms[roomId]) {
-               rooms[roomId] = createGame(gameResult.type, gameResult.config);
+               rooms[roomId] = {
+                  game: createGame(gameResult.type, gameResult.config),
+                  gameResult,
+               };
             }
-            const game = rooms[roomId];
+            const game = rooms[roomId].game;
 
             socket.join(roomId);
             if (game.joinGame(userId)) {
@@ -52,7 +56,12 @@ let SocketService = (server) => {
 
          if (game) {
             game.play(data);
-            io.to(data.roomId).emit(UPDATE_GAME_ACTION, game.gameState);
+            if (game.gameState.gameOver) {
+               saveGame(data.roomId);
+               io.to(data.roomId).emit(GAME_OVER_ACTION, game.gameState);
+            } else {
+               io.to(data.roomId).emit(UPDATE_GAME_ACTION, game.gameState);
+            }
          } else {
             socket.emit(ERROR_ACTION, { msg: "Room doesn't exist" });
          }
@@ -66,6 +75,24 @@ function createGame(gameType, gameConfig) {
          return new X01Game(gameConfig);
       default:
          return null;
+   }
+}
+
+function saveGame(roomId) {
+   let gameResult = rooms[roomId].gameResult;
+   let game = rooms[roomId].game;
+
+   gameResult.completed = true;
+   gameResult.p1 = game.p1;
+   gameResult.p2 = game.p2;
+   gameResult.winner = game.gameState.matchWinner;
+   gameResult.stats = game.stats;
+
+   try {
+      await gameResult.save();
+      return true;
+   } catch (err) {
+      return false;
    }
 }
 

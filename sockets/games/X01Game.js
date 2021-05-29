@@ -1,16 +1,25 @@
 module.exports = class X01Game {
    constructor(gameConfig) {
-      // TODO: potentially refactor the way players/scores are stored
-      // to make accessing and modifying them easier
       this.p1 = null;
       this.p2 = null;
       this.gameState = {
          p1Score: gameConfig.startingScore,
          p2Score: gameConfig.startingScore,
+         gameOver: false,
+         matchWinner: null, // Winner of the match
+         turn: null,
+         currentLeg: 1,
+         legWinners: [], // Array storing playerID of each leg
       };
-      // this.numLegs = gameConfig.numLegs;
-      // this.numSets = gameConfig.numSets;
-      this.turn = null;
+      this.stats = {
+         p1TotalScored: 0,
+         p2TotalScored: 0,
+         p1DartsThrown: 0,
+         p2DartsThrown: 0,
+         p1ThreeDartAvg: 0,
+         p2ThreeDartAvg: 0,
+      };
+      this.numLegs = gameConfig.numLegs;
    }
 
    /**
@@ -20,8 +29,8 @@ module.exports = class X01Game {
     */
    shouldStart() {
       if (this.p1 && this.p2) {
-         this.turn = this.p1;
-         console.log("Game on! It's " + this.turn + "'s turn");
+         this.gameState.turn = this.p1;
+         console.log("Game on! It's " + this.gameState.turn + "'s turn");
          return true;
       }
       return false;
@@ -59,63 +68,90 @@ module.exports = class X01Game {
 
       this._scoreVisit(score, this.gameState.p1Score);
 
-      if (this._isGameOver()) {
-         let winner = null;
-         if (this.gameState.p1Score === 0) {
-            winner = this.p1;
-         } else {
-            winner = this.p2;
-         }
-         console.log('Game Over!');
-         console.log('The winner is ' + winner);
+      if (this._isLegOver()) {
+         this._handleLegOver();
       } else {
          this._swapTurns();
-         console.log("It's now " + this.turn + "'s turn");
+         console.log("It's now " + this.gameState.turn + "'s turn");
       }
    }
 
-   // if the game is over -> if so, then emit game over to socket and do other db stuff to save game
-   _isGameOver() {
+   _isLegOver() {
       if (this.gameState.p1Score === 0 || this.gameState.p2Score === 0) {
          return true;
       }
       return false;
    }
 
-   // TODO: refactor this function to be less repetitive
-   _scoreVisit(score) {
-      if (score > 180 || score < 0) {
-         // error
+   _handleLegOver() {
+      if (this.gameState.currentLeg === this.numLegs) {
+         this._handleMatchOver();
       } else {
-         if (this.turn == this.p1) {
-            let remaining = this.gameState.p1Score - score;
-
-            // Only update the score if they didn't bust
-            if (remaining >= 0) {
-               this.gameState.p1Score = remaining;
-               console.log('Player ' + this.turn + ' scored ' + score);
-            } else {
-               console.log('Player ' + this.turn + ' busted!');
-            }
+         // Figure out who won the leg & store the result
+         if (this.gameState.p1Score === 0) {
+            this.gameState.legWinners.push(this.p1);
          } else {
-            let remaining = this.gameState.p2Score - score;
+            this.gameState.legWinners.push(this.p2);
+         }
 
-            // Only update the score if they didn't bust
+         // Reset scores for the next leg and increment leg count
+         this.gameState.p1Score = this.startingScore;
+         this.gameState.p2Score = this.startingScore;
+         this.gameState.currentLeg++;
+      }
+   }
+
+   _handleMatchOver() {
+      this.gameState.gameOver = true;
+
+      if (this.gameState.p1Score === 0) {
+         this.gameState.matchWinner = this.p1;
+      } else {
+         this.gameState.matchWinner = this.p2;
+      }
+      console.log('Game Over!');
+      console.log('The winner is ' + this.gameState.matchWinner);
+   }
+
+   _scoreVisit(data) {
+      if (data.score > 180 || data.score < 0) {
+         // TODO: error
+      } else {
+         if (this.gameState.turn == this.p1) {
+            this.stats.p1DartsThrown += data.dartsThrown;
+
+            let remaining = this.gameState.p1Score - data.score;
+
             if (remaining >= 0) {
-               this.gameState.p2Score = remaining;
-               console.log('Player ' + this.turn + ' scored ' + score);
+               this.stats.p1TotalScored += data.score;
+               this.gameState.p1Score = remaining;
+               console.log('Player ' + this.gameState.turn + ' scored ' + data.score);
             } else {
-               console.log('Player ' + this.turn + ' busted!');
+               console.log('Player ' + this.gameState.turn + ' busted!');
             }
+            this.stats.p1ThreeDartAvg = (this.stats.p1TotalScored / this.stats.p1DartsThrown) * 3;
+         } else {
+            this.stats.p2DartsThrown += data.dartsThrown;
+
+            let remaining = this.gameState.p2Score - data.score;
+
+            if (remaining >= 0) {
+               this.stats.p2TotalScored += data.score;
+               this.gameState.p2Score = remaining;
+               console.log('Player ' + this.gameState.turn + ' scored ' + data.score);
+            } else {
+               console.log('Player ' + this.gameState.turn + ' busted!');
+            }
+            this.stats.p1ThreeDartAvg = (this.stats.p1TotalScored / this.stats.p1DartsThrown) * 3;
          }
       }
    }
 
    _swapTurns() {
-      if (this.turn == this.p1) {
-         this.turn = this.p2;
+      if (this.gameState.turn == this.p1) {
+         this.gameState.turn = this.p2;
       } else {
-         this.turn = this.p1;
+         this.gameState.turn = this.p1;
       }
    }
 };

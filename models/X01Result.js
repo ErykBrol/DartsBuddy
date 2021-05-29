@@ -14,12 +14,14 @@ const X01ResultSchema = new Schema({
       type: Number,
       required: true,
    },
-   startingPlayer: {
-      type: String,
-      required: true,
-   },
    winner: {
       type: String,
+   },
+   p1Visits: {
+      type: Number,
+   },
+   p2Visits: {
+      type: Number,
    },
    p1ThreeDartAvg: {
       type: Number,
@@ -27,10 +29,16 @@ const X01ResultSchema = new Schema({
    p2ThreeDartAvg: {
       type: Number,
    },
-   p1FirstNineAvg: {
+   p1TotalScored: {
       type: Number,
    },
-   p2FirstNineAvg: {
+   p2TotalScored: {
+      type: Number,
+   },
+   p1DartsThrown: {
+      type: Number,
+   },
+   p2DartsThrown: {
       type: Number,
    },
 });
@@ -39,7 +47,6 @@ const X01ResultSchema = new Schema({
 X01ResultSchema.virtual('config').get(function () {
    return {
       startingScore: this.startingScore,
-      startingPlayer: this.startingPlayer,
    };
 });
 
@@ -51,12 +58,23 @@ X01ResultSchema.virtual('players').get(function () {
 // Used to get this game's stats easily
 X01ResultSchema.virtual('stats').get(function () {
    return {
-      winner: this.winner,
       p1ThreeDartAvg: this.p1ThreeDartAvg,
       p2ThreeDartAvg: this.p2ThreeDartAvg,
-      p1FirstNineAvg: this.p1FirstNineAvg,
-      p2FirstNineAvg: this.p2FirstNineAvg,
+      p1TotalScored: this.p1TotalScored,
+      p2TotalScored: this.p2TotalScored,
+      p1DartsThrown: this.p1DartsThrown,
+      p2DartsThrown: this.p2DartsThrown,
    };
+});
+
+// Used to set this game's stats easily
+X01ResultSchema.virtual('stats').set(function (stats) {
+   this.p1ThreeDartAvg = stats.p1ThreeDartAvg;
+   this.p2ThreeDartAvg = stats.p2ThreeDartAvg;
+   this.p1TotalScored = stats.p1TotalScored;
+   this.p2TotalScored = stats.p2TotalScored;
+   this.p1DartsThrown = stats.p1DartsThrown;
+   this.p2DartsThrown = stats.p2DartsThrown;
 });
 
 module.exports = GameResult.discriminator('X01Results', X01ResultSchema);
