@@ -106,4 +106,4 @@ dist
 # custom stuff
 TODO.md
 config/dev.js
-client
+build
