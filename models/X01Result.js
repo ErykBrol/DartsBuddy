@@ -14,8 +14,15 @@ const X01ResultSchema = new Schema({
       type: Number,
       required: true,
    },
+   numLegs: {
+      type: Number,
+      required: true,
+   },
    winner: {
       type: String,
+   },
+   legWinners: {
+      type: [String],
    },
    p1Visits: {
       type: Number,
@@ -47,6 +54,7 @@ const X01ResultSchema = new Schema({
 X01ResultSchema.virtual('config').get(function () {
    return {
       startingScore: this.startingScore,
+      numLegs: this.numLegs,
    };
 });
 

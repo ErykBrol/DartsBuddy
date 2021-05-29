@@ -52,12 +52,12 @@ let SocketService = (server) => {
       });
 
       socket.on('play', (data) => {
-         const game = rooms[data.roomId];
+         const game = rooms[data.roomId].game;
 
          if (game) {
             game.play(data);
             if (game.gameState.gameOver) {
-               saveGame(data.roomId);
+               saveGame(rooms[data.roomId]);
                io.to(data.roomId).emit(GAME_OVER_ACTION, game.gameState);
             } else {
                io.to(data.roomId).emit(UPDATE_GAME_ACTION, game.gameState);
@@ -78,14 +78,15 @@ function createGame(gameType, gameConfig) {
    }
 }
 
-function saveGame(roomId) {
-   let gameResult = rooms[roomId].gameResult;
-   let game = rooms[roomId].game;
+async function saveGame(room) {
+   let gameResult = room.gameResult;
+   let game = room.game;
 
    gameResult.completed = true;
    gameResult.p1 = game.p1;
    gameResult.p2 = game.p2;
    gameResult.winner = game.gameState.matchWinner;
+   gameResult.legWinners = game.gameState.legWinners;
    gameResult.stats = game.stats;
 
    try {
