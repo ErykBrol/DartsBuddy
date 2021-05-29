@@ -82,12 +82,9 @@ async function saveGame(room) {
    let gameResult = room.gameResult;
    let game = room.game;
 
-   gameResult.completed = true;
-   gameResult.p1 = game.p1;
-   gameResult.p2 = game.p2;
-   gameResult.winner = game.gameState.matchWinner;
-   gameResult.legWinners = game.gameState.legWinners;
-   gameResult.stats = game.stats;
+   // Call the game's saveGame method to save whatever specific the game
+   // needs to save
+   game.saveGame(gameResult);
 
    try {
       await gameResult.save();

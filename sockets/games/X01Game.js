@@ -11,11 +11,11 @@ module.exports = class X01Game {
          matchWinner: null, // Winner of the match
          turn: null,
          currentLeg: 1,
-         legWinners: [], // Array storing playerID of each leg
          p1LegsWon: 0,
          p2LegsWon: 0,
       };
       this.stats = {
+         legWinners: [], // Array storing playerID of each leg
          p1TotalScored: 0,
          p2TotalScored: 0,
          p1DartsThrown: 0,
@@ -73,6 +73,14 @@ module.exports = class X01Game {
          this._swapTurns();
          console.log("It's now " + this.gameState.turn + "'s turn");
       }
+   }
+
+   saveGame(gameResult) {
+      gameResult.completed = true;
+      gameResult.p1 = game.p1;
+      gameResult.p2 = game.p2;
+      gameResult.matchWinner = game.gameState.matchWinner;
+      gameResult.stats = game.stats;
    }
 
    _isLegOver() {
