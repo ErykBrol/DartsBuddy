@@ -14,6 +14,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
+import CreateGame from './CreateGame';
+import JoinGame from './JoinGame';
 
 const useStyles = (theme) => ({
    root: {
@@ -95,6 +97,8 @@ class Navbar extends Component {
       if (auth) {
          return (
             <Fragment>
+               <JoinGame />
+               <CreateGame />
                <Button
                   aria-controls="simple-menu"
                   aria-haspopup="true"

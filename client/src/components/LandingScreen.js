@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { compose } from 'redux';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 const useStyles = (theme) => ({
@@ -28,6 +29,22 @@ const useStyles = (theme) => ({
 });
 
 class LandingScreen extends Component {
+   getButtonsIfNotAuthed(auth, classes) {
+      if (!auth) {
+         return (
+            <div>
+               <Button href="/register" variant="contained" color="secondary" className={classes.submit}>
+                  Sign Up
+               </Button>
+               <Button href="/login" variant="contained" color="primary" className={classes.submit}>
+                  Login
+               </Button>
+            </div>
+         );
+      } else {
+         return;
+      }
+   }
    render() {
       const { classes } = this.props;
       return (
@@ -44,14 +61,7 @@ class LandingScreen extends Component {
                         Sign up for free or login to an existing account.
                      </Typography>
                   </div>
-                  <div>
-                     <Button href="/register" variant="contained" color="secondary" className={classes.submit}>
-                        Sign Up
-                     </Button>
-                     <Button href="/login" variant="contained" color="primary" className={classes.submit}>
-                        Login
-                     </Button>
-                  </div>
+                  {this.getButtonsIfNotAuthed(this.props.auth, classes)}
                </div>
             </Container>
          </div>
@@ -59,4 +69,8 @@ class LandingScreen extends Component {
    }
 }
 
-export default compose(withStyles(useStyles), withRouter)(LandingScreen);
+function mapStateToProps({ auth }) {
+   return { auth };
+}
+
+export default compose(withStyles(useStyles), withRouter, connect(mapStateToProps))(LandingScreen);
