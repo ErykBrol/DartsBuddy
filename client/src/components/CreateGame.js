@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { withRouter } from 'react-router';
 import CreateIcon from '@material-ui/icons/Create';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
@@ -16,7 +17,7 @@ const useStyles = (theme) => ({
    },
 });
 
-class FileUploader extends Component {
+class CreateGame extends Component {
    state = {
       dropdownAnchorElement: null,
    };
@@ -27,7 +28,8 @@ class FileUploader extends Component {
       this.setState({ dropdownAnchorElement: null });
    };
    handleX01 = () => {
-      console.log('Create X01 game');
+      this.handleClose();
+      this.props.history.push('/create/X01');
    };
 
    anchorDropdown = () => {
@@ -86,4 +88,4 @@ function mapStateToProps({ auth }) {
    return { auth };
 }
 
-export default compose(withStyles(useStyles), connect(mapStateToProps, actions))(FileUploader);
+export default compose(withStyles(useStyles), connect(mapStateToProps, actions), withRouter)(CreateGame);

@@ -6,7 +6,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -57,7 +56,6 @@ class JoinGame extends Component {
             <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
                <DialogTitle id="form-dialog-title">Join Game</DialogTitle>
                <DialogContent>
-                  {/* <Typography>Enter game code:</Typography> */}
                   <TextField
                      value={this.state.roomCode}
                      onChange={this.handleChange}
