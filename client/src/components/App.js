@@ -6,6 +6,7 @@ import * as actions from '../actions';
 import SignInScreen from './auth/SignInScreen';
 import SignUpScreen from './auth/SignUpScreen';
 import LandingScreen from './LandingScreen';
+import Navbar from './Navbar';
 
 class App extends Component {
    componentDidMount() {
@@ -15,6 +16,7 @@ class App extends Component {
    render() {
       return (
          <BrowserRouter>
+            <Navbar />
             <div>
                <Switch>
                   <Route path="/" exact component={LandingScreen} />
