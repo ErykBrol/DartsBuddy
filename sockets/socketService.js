@@ -11,14 +11,18 @@ const {
 
 let SocketService = (server) => {
    let rooms = {};
-   const io = require('socket.io')(server);
+   const io = require('socket.io')(server, {
+      cors: {
+         origin: 'http://localhost:3000',
+         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+      },
+   });
 
    io.on('connection', (socket) => {
       console.log('user #' + socket.id + ' connected');
 
       socket.on('joinRoom', async (data) => {
-         const roomId = data.roomId;
-         const userId = data.userId;
+         const { roomId, userId } = data;
 
          // Find the GameResult entry created with this roomId, only want not complete ones to avoid collisions
          // with previous games that shared this roomID
@@ -27,27 +31,24 @@ let SocketService = (server) => {
             socket.emit(ERROR_ACTION, { msg: 'Error finding game with this roomId' });
          });
 
-         if (gameResult) {
-            if (!rooms[roomId]) {
-               rooms[roomId] = {
-                  game: createGame(gameResult.type, gameResult.config),
-                  gameResult,
-               };
-            }
-            const game = rooms[roomId].game;
+         if (!rooms[roomId]) {
+            rooms[roomId] = {
+               game: createGame(gameResult.type, gameResult.config),
+               gameResult,
+            };
+         }
+         const game = rooms[roomId].game;
 
+         if (game.joinGame(userId)) {
             socket.join(roomId);
-            if (game.joinGame(userId)) {
-               console.log('Client ' + socket.id + ' joined room with id: ' + roomId);
-               io.to(roomId).emit(ROOM_JOINED_ACTION, roomId);
-            } else {
-               socket.emit(ERROR_ACTION, { msg: 'Error joining game' });
-            }
-            if (game.shouldStart()) {
-               io.to(roomId).emit(START_GAME_ACTION, game.gameState);
-            }
+            console.log('Client ' + socket.id + ' joined room with id: ' + roomId);
+            io.to(roomId).emit(ROOM_JOINED_ACTION, roomId);
          } else {
-            socket.emit(ERROR_ACTION, { msg: "Room doesn't exist" });
+            socket.emit(ERROR_ACTION, { msg: 'Error joining game' });
+         }
+         if (game.shouldStart()) {
+            console.log('starting gmae ---------------------------------------');
+            io.to(roomId).emit(START_GAME_ACTION, { players: { p1: game.p1, p2: game.p2 }, gameState: game.gameState });
          }
       });
 

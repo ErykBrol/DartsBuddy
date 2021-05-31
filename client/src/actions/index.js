@@ -8,6 +8,7 @@ import {
    UPDATE_SOCKET,
    CREATE_ROOM,
    JOIN_ROOM,
+   PLAY_GAME,
 } from './types';
 
 /* Authentication actions */
@@ -34,7 +35,6 @@ export const loginUser = (userData) => async (dispatch) => {
    if (res.status !== 200) {
       return false;
    } else {
-      debugger;
       dispatch({ type: LOGGED_IN, payload: res.data });
       return true;
    }
@@ -47,7 +47,6 @@ export const logoutUser = () => async (dispatch) => {
 
 /* SocketIO - socket actions */
 export const connectToSocket = () => (dispatch) => {
-   debugger;
    dispatch({ type: CONNECT_TO_SOCKET, payload: null });
 };
 
@@ -56,10 +55,20 @@ export const updateSocket = (socket) => (dispatch) => {
 };
 
 /* SocketIO - game actions */
-export const createRoom = (roomConfig) => (dispatch) => {
-   dispatch({ type: CREATE_ROOM, payload: roomConfig });
+export const createRoom = (roomConfig) => async (dispatch) => {
+   const res = await axios.post(`/games/${roomConfig.gameConfig.type}`, roomConfig);
+   if (res.status !== 201) {
+      return false;
+   } else {
+      dispatch({ type: CREATE_ROOM, payload: res.data });
+      return true;
+   }
 };
 
 export const joinRoom = (roomId) => (dispatch) => {
    dispatch({ type: JOIN_ROOM, payload: roomId });
+};
+
+export const playGame = (data) => (dispatch) => {
+   dispatch({ type: PLAY_GAME, payload: data });
 };

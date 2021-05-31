@@ -52,6 +52,7 @@ class SignIn extends Component {
          .then((result) => {
             this.setState({ error: result ? '' : 'Invalid username or password' });
             if (result) {
+               this.props.connectToSocket();
                this.props.history.push({
                   pathname: '/',
                });

@@ -57,8 +57,13 @@ class X01Form extends Component {
    };
 
    handleSubmit = () => {
-      this.setState({ open: true });
-      console.log(this.state);
+      this.props
+         .createRoom({
+            gameConfig: { startingScore: this.state.startingScore, type: 'X01', numLegsToWin: this.state.numLegs },
+         })
+         .then(() => {
+            this.setState({ open: true, roomCode: this.props.game.roomId });
+         });
    };
 
    handleClose = (event, reason) => {
@@ -132,4 +137,8 @@ class X01Form extends Component {
    }
 }
 
-export default compose(withStyles(useStyles), withRouter, connect(null, actions))(X01Form);
+function mapStateToProps({ game }) {
+   return { game };
+}
+
+export default compose(withStyles(useStyles), withRouter, connect(mapStateToProps, actions))(X01Form);

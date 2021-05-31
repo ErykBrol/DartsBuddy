@@ -9,7 +9,6 @@ const initalState = {
 export default function (state = initalState, action) {
    switch (action.type) {
       case CONNECT_TO_SOCKET:
-         debugger;
          return {
             ...state,
             socketConnected: true,

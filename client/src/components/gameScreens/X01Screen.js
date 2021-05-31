@@ -34,20 +34,8 @@ const useStyles = (theme) => ({
 
 class X01Screen extends Component {
    state = {
-      p1: 'player1',
-      p2: 'player2',
-      p1Score: 501,
-      p2Score: 501,
-      turn: 'player1',
-      p1Legs: 0,
-      p2Legs: 0,
       inputScore: '',
    };
-
-   componentDidMount() {
-      debugger;
-      this.props.connectToSocket();
-   }
 
    handleEraseClick = () => {
       this.setState({ inputScore: this.state.inputScore.slice(0, -1) });
@@ -56,8 +44,8 @@ class X01Screen extends Component {
    handleScoreSubmit = () => {
       console.log(this.state.inputScore);
       if (this.validateX01Score()) {
+         this.props.playGame({ roomId: this.props.game.roomId, score: this.state.inputScore });
          this.setState({ inputScore: '' });
-         // Do stuff to actually send score to backend
       } else {
          alert('Score must be between 0-180');
       }
@@ -88,30 +76,34 @@ class X01Screen extends Component {
             >
                <Paper className={classes.scoreboardPaper} elevation={3}>
                   <Typography style={{ textTransform: 'none' }} variant="h2" className={classes.title}>
-                     {`${this.state.p1Score}`}
+                     {`${this.props.game.gameState.p1Score}`}
                   </Typography>
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                     {this.state.p1 === this.state.turn ? <FiberManualRecordIcon color="secondary" /> : null}
+                     {this.props.game.players.p1 === this.props.game.gameState.turn ? (
+                        <FiberManualRecordIcon color="secondary" />
+                     ) : null}
                      <Typography style={{ textTransform: 'none' }} variant="h6" className={classes.title}>
-                        {`${this.state.p1}`}
+                        {`${this.props.game.players.p1}`}
                      </Typography>
                   </div>
                   <Typography style={{ textTransform: 'none' }} variant="subtitle2" className={classes.title}>
-                     {`Legs: ${this.state.p1Legs}`}
+                     {`Legs: ${this.props.game.gameState.p1LegsWon}`}
                   </Typography>
                </Paper>
                <Paper className={classes.scoreboardPaper} elevation={3}>
                   <Typography style={{ textTransform: 'none' }} variant="h2" className={classes.title}>
-                     {`${this.state.p2Score}`}
+                     {`${this.props.game.gameState.p2Score}`}
                   </Typography>
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                     {this.state.p2 === this.state.turn ? <FiberManualRecordIcon color="secondary" /> : null}
+                     {this.props.game.players.p2 === this.props.game.gameState.turn ? (
+                        <FiberManualRecordIcon color="secondary" />
+                     ) : null}
                      <Typography style={{ textTransform: 'none' }} variant="h6" className={classes.title}>
-                        {`${this.state.p2}`}
+                        {`${this.props.game.players.p2}`}
                      </Typography>
                   </div>
                   <Typography style={{ textTransform: 'none' }} variant="subtitle2" className={classes.title}>
-                     {`Legs: ${this.state.p2Legs}`}
+                     {`Legs: ${this.props.game.gameState.p2LegsWon}`}
                   </Typography>
                </Paper>
             </div>
@@ -327,8 +319,8 @@ class X01Screen extends Component {
    }
 }
 
-function mapStateToProps({ auth, socket }) {
-   return { auth, socket };
+function mapStateToProps({ auth, game }) {
+   return { auth, game };
 }
 
 export default compose(withStyles(useStyles), connect(mapStateToProps, actions))(X01Screen);

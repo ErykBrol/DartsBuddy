@@ -9,6 +9,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { withRouter } from 'react-router';
 
 import * as actions from '../actions';
 
@@ -38,7 +39,9 @@ class JoinGame extends Component {
    };
 
    handleRoomJoin = () => {
-      console.log('join room with id#' + this.state.roomCode);
+      this.props.joinRoom(this.state.roomCode);
+      this.handleClose();
+      this.props.history.push('/play/X01');
    };
 
    render() {
@@ -84,4 +87,4 @@ function mapStateToProps({ auth }) {
    return { auth };
 }
 
-export default compose(withStyles(useStyles), connect(mapStateToProps, actions))(JoinGame);
+export default compose(withStyles(useStyles), connect(mapStateToProps, actions), withRouter)(JoinGame);

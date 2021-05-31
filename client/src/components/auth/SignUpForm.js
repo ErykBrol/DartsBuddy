@@ -76,6 +76,7 @@ class SignUp extends Component {
          if (result) {
             this.props.loginUser({ username: this.state.username, password: this.state.password }).then((result) => {
                if (result) {
+                  this.props.connectToSocket();
                   this.props.history.push({
                      pathname: '/',
                   });
