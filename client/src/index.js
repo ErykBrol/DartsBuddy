@@ -6,13 +6,19 @@ import reduxThunk from 'redux-thunk';
 
 import App from './components/App';
 import reducers from './reducers';
+import socketMiddleware from './middleware/socketMiddleware';
+import gameMiddleware from './middleware/gameMiddleware';
+import theme from './materialUITheme';
+import { ThemeProvider } from '@material-ui/core/styles';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(reducers, {}, composeEnhancers(applyMiddleware(reduxThunk)));
+const store = createStore(reducers, {}, composeEnhancers(applyMiddleware(reduxThunk, socketMiddleware)));
 
 ReactDOM.render(
-   <Provider store={store}>
-      <App />
-   </Provider>,
+   <ThemeProvider theme={theme}>
+      <Provider store={store}>
+         <App />
+      </Provider>
+   </ThemeProvider>,
    document.querySelector('#root')
 );

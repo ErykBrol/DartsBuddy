@@ -1,6 +1,16 @@
 import axios from 'axios';
-import { FETCH_USER, REGISTERED, LOGGED_IN, LOGGED_OUT } from './types';
+import {
+   FETCH_USER,
+   REGISTERED,
+   LOGGED_IN,
+   LOGGED_OUT,
+   CONNECT_TO_SOCKET,
+   UPDATE_SOCKET,
+   CREATE_ROOM,
+   JOIN_ROOM,
+} from './types';
 
+/* Authentication actions */
 export const fetchUser = () => async (dispatch) => {
    const res = await axios.get('/auth/current_user');
    dispatch({ type: FETCH_USER, payload: res.data });
@@ -33,4 +43,23 @@ export const loginUser = (userData) => async (dispatch) => {
 export const logoutUser = () => async (dispatch) => {
    const res = await axios.get('/auth/logout');
    dispatch({ type: LOGGED_OUT, payload: res.data });
+};
+
+/* SocketIO - socket actions */
+export const connectToSocket = () => (dispatch) => {
+   debugger;
+   dispatch({ type: CONNECT_TO_SOCKET, payload: null });
+};
+
+export const updateSocket = (socket) => (dispatch) => {
+   dispatch({ type: UPDATE_SOCKET, payload: socket });
+};
+
+/* SocketIO - game actions */
+export const createRoom = (roomConfig) => (dispatch) => {
+   dispatch({ type: CREATE_ROOM, payload: roomConfig });
+};
+
+export const joinRoom = (roomId) => (dispatch) => {
+   dispatch({ type: JOIN_ROOM, payload: roomId });
 };

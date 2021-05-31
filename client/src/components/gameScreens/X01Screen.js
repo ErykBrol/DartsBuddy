@@ -44,6 +44,11 @@ class X01Screen extends Component {
       inputScore: '',
    };
 
+   componentDidMount() {
+      debugger;
+      this.props.connectToSocket();
+   }
+
    handleEraseClick = () => {
       this.setState({ inputScore: this.state.inputScore.slice(0, -1) });
    };
@@ -322,8 +327,8 @@ class X01Screen extends Component {
    }
 }
 
-function mapStateToProps({ auth }) {
-   return { auth };
+function mapStateToProps({ auth, socket }) {
+   return { auth, socket };
 }
 
 export default compose(withStyles(useStyles), connect(mapStateToProps, actions))(X01Screen);
