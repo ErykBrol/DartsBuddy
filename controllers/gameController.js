@@ -14,7 +14,7 @@ let GameController = {
          query.find({ type: req.query.type_id });
       }
       if (req.query.user_id) {
-         query.find({ $or: [{ p1: req.params.user_id }, { p2: req.params.user_id }] });
+         query.find({ $or: [{ p1: req.query.user_id }, { p2: req.query.user_id }] });
       }
 
       const games = await query.exec().catch((err) => {
@@ -33,7 +33,7 @@ let GameController = {
    createGame: async (req, res) => {
       // Create the roomId and appropriate Game based on the query param
       const roomId = nanoid();
-      const game = createGame(req.params.type, req.body.gameConfig);
+      const game = createGameHelper(req.params.type, req.body.gameConfig);
 
       if (!game) {
          return res.status(500).send({ msg: 'Error creating game' });
@@ -44,7 +44,7 @@ let GameController = {
       try {
          await game.save();
          // Send the roomId back to the user so they know how to join this game
-         return res.status(201).send({ msg: 'Game succesfully created', data: { roomId } });
+         return res.status(201).send({ msg: 'Game succesfully created', data: { roomId, id: game._id } });
       } catch (err) {
          return res.status(500).send({ msg: 'Error creating game', err });
       }
@@ -57,7 +57,7 @@ let GameController = {
    },
 };
 
-function createGame(gameType, gameConfig) {
+function createGameHelper(gameType, gameConfig) {
    switch (gameType) {
       case GAME_TYPES.X01:
          return new X01(gameConfig);

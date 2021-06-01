@@ -51,6 +51,7 @@ UserSchema.virtual('info').get(function () {
       username: this.username,
       nickname: this.nickname,
       dateJoined: this.dateJoined,
+      id: this._id,
    };
 });
 

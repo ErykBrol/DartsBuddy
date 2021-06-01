@@ -39,7 +39,7 @@ let UserController = {
    },
    deleteUser: async (req, res) => {
       // A user can only delete themselves
-      if (req.user._id !== req.params.user_id) {
+      if (req.user._id != req.params.user_id) {
          return res.status(401).send({ msg: 'Unauthorized to delete this user' });
       }
       await User.findByIdAndDelete(req.params.user_id).catch((err) => {
