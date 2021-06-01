@@ -19,10 +19,6 @@ const UserSchema = new Schema({
 		required: false,
 		maxLength: 20,
 	},
-	dateJoined: {
-		type: Date,
-		required: true,
-	},
 	totalVisits: {
 		type: Number,
 		default: 0,
@@ -43,19 +39,19 @@ const UserSchema = new Schema({
 		type: Number,
 		default: 0,
 	},
-});
+}, { timestamps: true });
 
-// Used to get basic user info out of Schema easily
+// Return basic user info summary
 UserSchema.virtual('info').get(function () {
 	return {
 		username: this.username,
 		nickname: this.nickname,
-		dateJoined: this.dateJoined,
+		createdAt: this.createdAt,
 		id: this._id,
 	};
 });
 
-// Used to get basic stats out of Schema easily
+// Return user stats
 UserSchema.virtual('stats').get(function () {
 	return {
 		totalVisits: this.totalVisits,

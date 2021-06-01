@@ -2,7 +2,7 @@ const passport = require('passport');
 
 let AuthController = {
    login: async (req, res, next) => {
-      passport.authenticate('local', function (err, user, info) {
+      passport.authenticate('local', function (err, user) {
          if (err || !user) {
             return res.status(400).send({ msg: "User doesn't exist." });
          }

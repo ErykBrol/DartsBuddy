@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const GAME_TYPES = require('./gameTypes');
+const GAME_TYPES = require('./games/gameTypes');
 
 /**
  * GameSchema is a 'base' schema for all game results
@@ -13,10 +13,6 @@ const gameSchema = new Schema({
       type: String,
       enum: GAME_TYPES,
       default: GAME_TYPES.X01,
-   },
-   dateCreated: {
-      type: Date,
-      required: true,
    },
    roomId: {
       type: String,
@@ -38,6 +34,6 @@ const gameSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'users',
    },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('games', gameSchema);

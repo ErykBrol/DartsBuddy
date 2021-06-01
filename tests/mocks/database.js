@@ -12,20 +12,20 @@ const userOne = {
 	_id: userOneId,
 	username: 'test1',
 	password: '1234',
-	dateJoined: '2021-06-01T05:19:07.896Z',
+	createdAt: '2021-06-01T05:19:07.896Z',
 };
 
 const userTwo = {
 	_id: userTwoId,
 	username: 'test2',
 	password: '1234',
-	dateJoined: '2021-06-01T05:19:07.896Z',
+	createdAt: '2021-06-01T05:19:07.896Z',
 };
 
 const userOneGameOne = {
 	_id: userOneGameOneId,
 	type: 'X01',
-	dateCreated: '2021-06-01T05:19:07.896Z',
+	createdAt: '2021-06-01T05:19:07.896Z',
 	roomId: 'ABC123',
 	startingScore: 501,
 	numLegsToWin: 2,
@@ -34,7 +34,7 @@ const userOneGameOne = {
 const userTwoGameOne = {
 	_id: userTwoGameOneId,
 	type: 'X01',
-	dateCreated: '2021-06-01T05:19:07.896Z',
+	createdAt: '2021-06-01T05:19:07.896Z',
 	roomId: 'DEF456',
 	startingScore: 301,
 	numLegsToWin: 5,

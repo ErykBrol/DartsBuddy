@@ -49,12 +49,8 @@ if (process.env.NODE_ENV === 'production') {
 	// });
 }
 
-app.get('/', (req, res) => {
-	res.sendFile('E:\\git_workspace\\DartsBuddy\\DartsBuddy\\client\\index.html');
-});
-
 /* Connect to socket manager */
-require('./sockets/socketService')(server, passport, sessionMiddleware);
+require('./sockets/socketService')(server);
 
 server.listen(keys.port);
 

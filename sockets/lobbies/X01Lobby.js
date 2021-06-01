@@ -30,7 +30,7 @@ module.exports = class X01Lobby {
     *
     * @returns true if 2 players are in the room, false otherwise
     */
-   shouldStart() {
+   startGame() {
       if (this.p1 && this.p2) {
          this.gameState.currentPlayer = this.p1.username;
          console.log("Game on! It's " + this.gameState.currentPlayer + "'s turn");
@@ -69,24 +69,6 @@ module.exports = class X01Lobby {
 
       if (this._isLegOver()) {
          this._handleLegOver();
-      }
-   }
-
-   /* TODO: add comment */
-   async saveGame() {
-      console.log('Saving game...');
-      this.game.completed = true;
-      this.game.p1 = this.p1;
-      this.game.p2 = this.p2;
-      this.game.winner = this.gameState.matchWinner;
-      this.game.stats = this.stats;
-
-      this._saveUserStats();
-
-      try {
-         await this.game.save();
-      } catch (err) {
-         console.log(err);
       }
    }
 
@@ -140,7 +122,8 @@ module.exports = class X01Lobby {
       console.log('Game Over!');
       console.log('The winner is ' + this.gameState.matchWinner.username);
 
-      this.saveGame();
+      this._saveUserStats();
+      this._saveGame();
    }
 
    _scoreVisit(data) {
@@ -184,12 +167,25 @@ module.exports = class X01Lobby {
       console.log("It's now " + this.gameState.currentPlayer + "'s turn");
    }
 
-   async _saveUserStats() {
-      const p1 = this.p1;
-      const p2 = this.p2;
+   async _saveGame() {
+      console.log('Saving game...');
+      this.game.completed = true;
+      this.game.p1 = this.p1;
+      this.game.p2 = this.p2;
+      this.game.winner = this.gameState.matchWinner;
+      this.game.stats = this.stats;
 
+      try {
+         await this.game.save();
+      } catch (err) {
+         console.error('Unknown error: ', err);
+      }
+   }
+
+   async _saveUserStats() {
       // P1 stats
       this.p1.totalVisits += this.stats.p1Visits;
+      this.p1.totalScored += this.stats.p1TotalScored;
       this.p1.matchesPlayed++;
       if (this.gameState.matchWinner === this.p1) {
          this.p1.wins++;
@@ -199,6 +195,7 @@ module.exports = class X01Lobby {
 
       // P2 stats
       this.p2.totalVisits += this.stats.p2Visits;
+      this.p1.totalScored += this.stats.p1TotalScored;
       this.p2.matchesPlayed++;
       if (this.gameState.matchWinner === this.p2) {
          this.p2.wins++;
@@ -210,7 +207,7 @@ module.exports = class X01Lobby {
          await this.p1.save();
          await this.p2.save();
       } catch (err) {
-         console.log(err);
+         console.error('Unknown error: ', err);
       }
    }
 };

@@ -41,8 +41,6 @@ export default function (state = initalState, action) {
          return {
             ...state,
             gameOver: true,
-            gameState: {},
-            players: {},
             winner: action.payload,
          };
       case UPDATE_GAME:

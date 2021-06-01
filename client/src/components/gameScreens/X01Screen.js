@@ -47,7 +47,6 @@ class X01Screen extends Component {
    };
 
    handleScoreSubmit = () => {
-      console.log(this.state.inputScore);
       if (this.validateX01Score()) {
          this.props.playGame({ roomId: this.props.game.roomId, score: this.state.inputScore });
          this.setState({ inputScore: '' });
