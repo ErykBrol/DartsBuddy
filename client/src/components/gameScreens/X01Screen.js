@@ -112,6 +112,13 @@ class X01Screen extends Component {
       let isMyTurn = this.props.auth.username === this.props.game.gameState.turn;
       return (
          <div>
+            {this.props.game.gameStart ? null : (
+               <div style={{ width: '50%', margin: '50px auto 25px auto', display: 'flex', justifyContent: 'center' }}>
+                  <Typography style={{ textTransform: 'none' }} variant="h5" className={classes.title}>
+                     Waiting for everyone to join...
+                  </Typography>
+               </div>
+            )}
             {this.props.game.gameOver ? this.getGameOverScreen() : null}
             <div
                id="scoreboard"
@@ -119,34 +126,34 @@ class X01Screen extends Component {
             >
                <Paper className={classes.scoreboardPaper} elevation={3}>
                   <Typography style={{ textTransform: 'none' }} variant="h2" className={classes.title}>
-                     {`${this.props.game.gameState.p1Score}`}
+                     {`${this.props.game.gameState.p1Score || '_'}`}
                   </Typography>
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                      {this.props.game.players.p1 === this.props.game.gameState.turn ? (
                         <FiberManualRecordIcon color="secondary" />
                      ) : null}
                      <Typography style={{ textTransform: 'none' }} variant="h6" className={classes.title}>
-                        {`${this.props.game.players.p1}`}
+                        {`${this.props.game.players.p1 || '...'}`}
                      </Typography>
                   </div>
                   <Typography style={{ textTransform: 'none' }} variant="subtitle2" className={classes.title}>
-                     {`Legs: ${this.props.game.gameState.p1LegsWon}`}
+                     {`Legs: ${this.props.game.gameState.p1LegsWon || '0'}`}
                   </Typography>
                </Paper>
                <Paper className={classes.scoreboardPaper} elevation={3}>
                   <Typography style={{ textTransform: 'none' }} variant="h2" className={classes.title}>
-                     {`${this.props.game.gameState.p2Score}`}
+                     {`${this.props.game.gameState.p2Score || '_'}`}
                   </Typography>
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                      {this.props.game.players.p2 === this.props.game.gameState.turn ? (
                         <FiberManualRecordIcon color="secondary" />
                      ) : null}
                      <Typography style={{ textTransform: 'none' }} variant="h6" className={classes.title}>
-                        {`${this.props.game.players.p2}`}
+                        {`${this.props.game.players.p2 || '...'}`}
                      </Typography>
                   </div>
                   <Typography style={{ textTransform: 'none' }} variant="subtitle2" className={classes.title}>
-                     {`Legs: ${this.props.game.gameState.p2LegsWon}`}
+                     {`Legs: ${this.props.game.gameState.p2LegsWon || '0'}`}
                   </Typography>
                </Paper>
             </div>

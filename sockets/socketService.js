@@ -18,6 +18,7 @@ let SocketService = (server) => {
       },
    });
 
+   // req.session.passport.user
    io.on('connection', (socket) => {
       console.log('user #' + socket.id + ' connected');
 
@@ -26,29 +27,31 @@ let SocketService = (server) => {
 
          // Find the GameResult entry created with this roomId, only want not complete ones to avoid collisions
          // with previous games that shared this roomID
-         const gameResult = await GameResult.findOne({ roomId, completed: false }).catch((err) => {
-            console.log("ERROR: couldn't find the game");
+         const gameResult = await GameResult.findOne({ roomId, completed: false });
+         if (!gameResult) {
             socket.emit(ERROR_ACTION, { msg: 'Error finding game with this roomId' });
-         });
-
-         if (!rooms[roomId]) {
-            rooms[roomId] = {
-               game: createGame(gameResult.type, gameResult.config),
-               gameResult,
-            };
-         }
-         const game = rooms[roomId].game;
-
-         if (game.joinGame(userId)) {
-            socket.join(roomId);
-            console.log('Client ' + socket.id + ' joined room with id: ' + roomId);
-            io.to(roomId).emit(ROOM_JOINED_ACTION, roomId);
          } else {
-            socket.emit(ERROR_ACTION, { msg: 'Error joining game' });
-         }
-         if (game.shouldStart()) {
-            console.log('starting gmae ---------------------------------------');
-            io.to(roomId).emit(START_GAME_ACTION, { players: { p1: game.p1, p2: game.p2 }, gameState: game.gameState });
+            if (!rooms[roomId]) {
+               rooms[roomId] = {
+                  game: createGame(gameResult.type, gameResult.config),
+                  gameResult,
+               };
+            }
+            const game = rooms[roomId].game;
+
+            if (game.joinGame(userId)) {
+               socket.join(roomId);
+               console.log('Client ' + socket.id + ' joined room with id: ' + roomId);
+               io.to(roomId).emit(ROOM_JOINED_ACTION, roomId);
+            } else {
+               socket.emit(ERROR_ACTION, { msg: 'Error joining game' });
+            }
+            if (game.shouldStart()) {
+               io.to(roomId).emit(START_GAME_ACTION, {
+                  players: { p1: game.p1, p2: game.p2 },
+                  gameState: game.gameState,
+               });
+            }
          }
       });
 

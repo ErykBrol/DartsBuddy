@@ -20,7 +20,7 @@ let AuthController = {
       res.redirect('/');
    },
    currentUser: async (req, res) => {
-      res.send(req.user);
+      res.send(req.user?.info);
    },
 };
 

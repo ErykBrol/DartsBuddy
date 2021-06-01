@@ -21,9 +21,8 @@ export default function (state = initalState, action) {
          };
       case ENTER_ROOM:
          return {
-            ...state,
+            ...initalState,
             roomId: action.payload,
-            err: false,
          };
 
       case UPDATE_ROOM:

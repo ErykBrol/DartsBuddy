@@ -43,7 +43,6 @@ const UserSchema = new Schema({
       type: Number,
       default: 0,
    },
-   pastGames: [{ type: Schema.Types.ObjectId, ref: 'games' }],
 });
 
 // Used to get basic user info out of Schema easily

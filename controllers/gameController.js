@@ -13,6 +13,9 @@ let GameController = {
       if (req.query.type_id) {
          query.find({ type: req.query.type_id });
       }
+      if (req.query.user_id) {
+         query.find({ $or: [{ p1: req.params.user_id }, { p2: req.params.user_id }] });
+      }
 
       const gameResults = await query.exec().catch((err) => {
          return res.status(500).send({ msg: 'Error fetching game result', err });
@@ -26,15 +29,6 @@ let GameController = {
       });
 
       return res.send(gameResult);
-   },
-   getGamesByUser: async (req, res) => {
-      const gameResults = await GameResult.findById({
-         $or: [{ p1: req.params.user_id }, { p2: req.params.user_id }],
-      }).catch((err) => {
-         return res.status(500).send({ msg: 'Error fetching game result', err });
-      });
-
-      return res.send(gameResults);
    },
    createGame: async (req, res) => {
       // Create the roomId and appropriate Game based on the query param

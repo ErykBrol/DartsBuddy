@@ -30,6 +30,14 @@ const GameResultSchema = new Schema({
       type: Boolean,
       default: false,
    },
+   p1: {
+      type: Schema.Types.ObjectId,
+      ref: 'users',
+   },
+   p2: {
+      type: Schema.Types.ObjectId,
+      ref: 'users',
+   },
 });
 
 module.exports = mongoose.model('GameResults', GameResultSchema);
