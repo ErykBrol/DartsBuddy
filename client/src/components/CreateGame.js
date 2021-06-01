@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { Redirect } from 'react-router-dom';
 
 import * as actions from '../actions';
 
@@ -65,6 +66,9 @@ class CreateGame extends Component {
    };
 
    render() {
+      if (this.props.auth === false) {
+         return <Redirect to="/login" />;
+      }
       const { classes } = this.props;
       return (
          <label color="inherit">

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -10,6 +11,10 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import * as actions from '../../actions';
 
@@ -66,10 +71,48 @@ class X01Screen extends Component {
       return true;
    };
 
+   getGameOverScreen = () => {
+      return (
+         <Dialog
+            open={this.props.game.gameOver}
+            onClose={() => {
+               this.props.history.push('/');
+            }}
+            aria-labelledby="form-dialog-title"
+         >
+            <DialogTitle id="form-dialog-title">Game Over!</DialogTitle>
+            {this.props.auth.username === this.props.game.winner ? (
+               <DialogContent>You won! :)</DialogContent>
+            ) : (
+               <DialogContent>You lost! :(</DialogContent>
+            )}
+            <DialogActions>
+               <Button
+                  onClick={() => {
+                     this.props.history.push('/');
+                  }}
+                  color="primary"
+               >
+                  Exit
+               </Button>
+            </DialogActions>
+         </Dialog>
+      );
+   };
+
    render() {
+      if (this.props.auth === false) {
+         return <Redirect to="/login" />;
+      }
+      // console.log(this.props.game.roomId);
+      // if (!this.props.game.roomId) {
+      //    return <Redirect to="/" />;
+      // }
       const { classes } = this.props;
+      let isMyTurn = this.props.auth.username === this.props.game.gameState.turn;
       return (
          <div>
+            {this.props.game.gameOver ? this.getGameOverScreen() : null}
             <div
                id="scoreboard"
                style={{ width: '50%', margin: '50px auto 25px auto', display: 'flex', justifyContent: 'center' }}
@@ -112,6 +155,7 @@ class X01Screen extends Component {
                style={{ width: '50%', margin: '50px auto 25px auto', display: 'flex', justifyContent: 'center' }}
             >
                <TextField
+                  disabled={!isMyTurn}
                   onChange={this.handleInputChange}
                   value={this.state.inputScore}
                   id="scoreInput"
@@ -125,6 +169,7 @@ class X01Screen extends Component {
                >
                   <ButtonGroup variant="contained" color="primary">
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '1' });
                         }}
@@ -140,6 +185,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '2' });
                         }}
@@ -155,6 +201,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '3' });
                         }}
@@ -177,6 +224,7 @@ class X01Screen extends Component {
                >
                   <ButtonGroup variant="contained" color="primary">
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '4' });
                         }}
@@ -192,6 +240,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '5' });
                         }}
@@ -207,6 +256,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '6' });
                         }}
@@ -229,6 +279,7 @@ class X01Screen extends Component {
                >
                   <ButtonGroup variant="contained" color="primary">
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '7' });
                         }}
@@ -244,6 +295,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '8' });
                         }}
@@ -259,6 +311,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '9' });
                         }}
@@ -281,6 +334,7 @@ class X01Screen extends Component {
                >
                   <ButtonGroup variant="contained" color="primary">
                      <Button
+                        disabled={!isMyTurn}
                         onClick={this.handleEraseClick}
                         color="secondary"
                         style={{ borderRadius: '0px', minWidth: '100px' }}
@@ -289,6 +343,7 @@ class X01Screen extends Component {
                         <KeyboardBackspaceIcon style={{ color: '#FFFFFF' }} />
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={() => {
                            this.setState({ inputScore: this.state.inputScore + '0' });
                         }}
@@ -304,6 +359,7 @@ class X01Screen extends Component {
                         </Typography>
                      </Button>
                      <Button
+                        disabled={!isMyTurn}
                         onClick={this.handleScoreSubmit}
                         color="secondary"
                         style={{ borderRadius: '0px', minWidth: '100px' }}

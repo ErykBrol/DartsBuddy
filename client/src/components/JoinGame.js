@@ -45,6 +45,13 @@ class JoinGame extends Component {
    };
 
    render() {
+      // if (this.props.game.err !== false) {
+      //    this.props.game.err = false;
+      //    alert('You can only enter a room that exists!');
+      // }
+      // } else if (this.props.game.roomId) {
+      //    this.props.history.push('/play/X01');
+      // }
       const { classes } = this.props;
       return (
          <label color="inherit">
@@ -83,8 +90,8 @@ class JoinGame extends Component {
    }
 }
 
-function mapStateToProps({ auth }) {
-   return { auth };
+function mapStateToProps({ auth, game }) {
+   return { auth, game };
 }
 
 export default compose(withStyles(useStyles), connect(mapStateToProps, actions), withRouter)(JoinGame);

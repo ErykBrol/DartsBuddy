@@ -12,3 +12,4 @@ export const END_GAME = 'end_game';
 export const PLAY_GAME = 'play_game';
 export const UPDATE_GAME = 'update_game';
 export const ENTER_ROOM = 'enter_room';
+export const UPDATE_ERR = 'update_err';

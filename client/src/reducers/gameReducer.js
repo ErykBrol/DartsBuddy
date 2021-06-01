@@ -1,5 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { CREATE_ROOM, UPDATE_ROOM, START_GAME, END_GAME, UPDATE_GAME, ENTER_ROOM } from '../actions/types';
+import { CREATE_ROOM, UPDATE_ROOM, START_GAME, END_GAME, UPDATE_GAME, ENTER_ROOM, UPDATE_ERR } from '../actions/types';
 
 const initalState = {
    roomId: null,
@@ -9,6 +9,7 @@ const initalState = {
    gameOver: false,
    gameStart: false,
    winner: null,
+   err: false,
 };
 
 export default function (state = initalState, action) {
@@ -22,6 +23,7 @@ export default function (state = initalState, action) {
          return {
             ...state,
             roomId: action.payload,
+            err: false,
          };
 
       case UPDATE_ROOM:
@@ -48,6 +50,12 @@ export default function (state = initalState, action) {
          return {
             ...state,
             gameState: action.payload,
+         };
+      case UPDATE_ERR:
+         alert('You can only enter a room that exists!');
+         return {
+            ...state,
+            err: action.payload,
          };
       default:
          return state;

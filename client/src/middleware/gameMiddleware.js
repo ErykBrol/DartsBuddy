@@ -1,4 +1,13 @@
-import { JOIN_ROOM, UPDATE_ROOM, START_GAME, END_GAME, PLAY_GAME, UPDATE_GAME, ENTER_ROOM } from '../actions/types';
+import {
+   JOIN_ROOM,
+   UPDATE_ROOM,
+   START_GAME,
+   END_GAME,
+   PLAY_GAME,
+   UPDATE_GAME,
+   ENTER_ROOM,
+   UPDATE_ERR,
+} from '../actions/types';
 
 const gameMiddleware = (store) => (next) => (action) => {
    const state = store.getState();
@@ -37,10 +46,17 @@ const gameMiddleware = (store) => (next) => (action) => {
             });
          });
 
-         socket.on('game_over', (winner) => {
+         socket.on('game_over', (gameState) => {
             store.dispatch({
                type: END_GAME,
-               payload: winner,
+               payload: gameState.matchWinner,
+            });
+         });
+         socket.on('err', (data) => {
+            console.log(data);
+            store.dispatch({
+               type: UPDATE_ERR,
+               payload: data,
             });
          });
          break;
