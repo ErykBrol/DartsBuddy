@@ -109,7 +109,7 @@ class X01Screen extends Component {
       //    return <Redirect to="/" />;
       // }
       const { classes } = this.props;
-      let isMyTurn = this.props.auth.username === this.props.game.gameState.turn;
+      let isMyTurn = this.props.auth.username === this.props.game.gameState.currentPlayer;
       return (
          <div>
             {this.props.game.gameStart ? null : (
@@ -129,7 +129,7 @@ class X01Screen extends Component {
                      {`${this.props.game.gameState.p1Score || '_'}`}
                   </Typography>
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                     {this.props.game.players.p1 === this.props.game.gameState.turn ? (
+                     {this.props.game.players.p1 === this.props.game.gameState.currentPlayer ? (
                         <FiberManualRecordIcon color="secondary" />
                      ) : null}
                      <Typography style={{ textTransform: 'none' }} variant="h6" className={classes.title}>
@@ -145,7 +145,7 @@ class X01Screen extends Component {
                      {`${this.props.game.gameState.p2Score || '_'}`}
                   </Typography>
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                     {this.props.game.players.p2 === this.props.game.gameState.turn ? (
+                     {this.props.game.players.p2 === this.props.game.gameState.currentPlayer ? (
                         <FiberManualRecordIcon color="secondary" />
                      ) : null}
                      <Typography style={{ textTransform: 'none' }} variant="h6" className={classes.title}>

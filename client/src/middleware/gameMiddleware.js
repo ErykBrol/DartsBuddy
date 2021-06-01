@@ -20,7 +20,7 @@ const gameMiddleware = (store) => (next) => (action) => {
 
    switch (action.type) {
       case JOIN_ROOM:
-         socket.emit('joinRoom', { userId: state.auth.username, roomId: action.payload });
+         socket.emit('joinRoom', { username: state.auth.username, roomId: action.payload });
          socket.on('room_joined', (roomId) => {
             store.dispatch({
                type: ENTER_ROOM,

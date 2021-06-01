@@ -11,9 +11,6 @@ const mongoose = require('mongoose');
 const keys = require('./config/keys');
 require('./services/passport');
 
-/* Connect to socket manager */
-require('./sockets/socketService')(server);
-
 /* Connect to DB */
 mongoose.connect(keys.mongoURI, {
    useNewUrlParser: true,
@@ -29,12 +26,11 @@ const gameRoutes = require('./routes/gameRoutes');
 
 /* Middleware */
 app.use(express.json());
-app.use(
-   cookieSession({
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      keys: [keys.cookieKey],
-   })
-);
+const sessionMiddleware = cookieSession({
+   maxAge: 30 * 24 * 60 * 60 * 1000,
+   keys: [keys.cookieKey],
+});
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -56,5 +52,8 @@ if (process.env.NODE_ENV === 'production') {
 app.get('/', (req, res) => {
    res.sendFile('E:\\git_workspace\\DartsBuddy\\DartsBuddy\\client\\index.html');
 });
+
+/* Connect to socket manager */
+require('./sockets/socketService')(server, passport, sessionMiddleware);
 
 server.listen(keys.port);

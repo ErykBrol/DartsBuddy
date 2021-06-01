@@ -1,24 +1,26 @@
-module.exports = class X01Game {
-   constructor(gameConfig) {
+module.exports = class X01Lobby {
+   constructor(game) {
+      const config = game.config;
+      this.game = game;
       this.p1 = null;
       this.p2 = null;
-      this.numLegsToWin = gameConfig.numLegsToWin;
-      this.startingScore = gameConfig.startingScore;
+      this.numLegsToWin = config.numLegsToWin;
+      this.startingScore = config.startingScore;
       this.gameState = {
-         p1Score: gameConfig.startingScore,
-         p2Score: gameConfig.startingScore,
+         p1Score: config.startingScore,
+         p2Score: config.startingScore,
          gameOver: false,
-         matchWinner: null, // Winner of the match
-         turn: null,
+         matchWinner: null,
+         currentPlayer: null,
          currentLeg: 1,
          p1LegsWon: 0,
          p2LegsWon: 0,
       };
       this.stats = {
+         p1Visits: 0,
+         p2Visits: 0,
          p1TotalScored: 0,
          p2TotalScored: 0,
-         p1DartsThrown: 0,
-         p2DartsThrown: 0,
          p1ThreeDartAvg: 0,
          p2ThreeDartAvg: 0,
       };
@@ -32,8 +34,8 @@ module.exports = class X01Game {
     */
    shouldStart() {
       if (this.p1 && this.p2) {
-         this.gameState.turn = this.p1;
-         console.log("Game on! It's " + this.gameState.turn + "'s turn");
+         this.gameState.currentPlayer = this.p1.username;
+         console.log("Game on! It's " + this.gameState.currentPlayer + "'s turn");
          return true;
       }
       return false;
@@ -42,15 +44,15 @@ module.exports = class X01Game {
    /**
     * Add this player to the game if possible
     *
-    * @param player userId of the player that's joining
+    * @param user object of the player that's joining
     * @returns true on success, false on failure
     */
-   joinGame(player) {
+   joinGame(user) {
       if (!this.p1) {
-         this.p1 = player;
+         this.p1 = user;
          return true;
       } else if (!this.p2) {
-         this.p2 = player;
+         this.p2 = user;
          return true;
       } else {
          return false;
@@ -58,7 +60,7 @@ module.exports = class X01Game {
    }
 
    /**
-    * Process a turn being taken
+    * Process a currentPlayer being taken
     *
     * @param data object containing info about the player/move that was made
     * @param gameState object containing the state of the game before the move was made
@@ -72,12 +74,27 @@ module.exports = class X01Game {
       }
    }
 
-   saveGame(gameResult) {
-      gameResult.completed = true;
-      gameResult.p1 = this.p1;
-      gameResult.p2 = this.p2;
-      gameResult.winner = this.gameState.winner;
-      gameResult.stats = this.stats;
+   async saveGame() {
+      console.log('Saving game...');
+      this.game.completed = true;
+      this.game.p1 = this.p1;
+      this.game.p2 = this.p2;
+      this.game.winner = this.gameState.matchWinner;
+      this.game.stats = this.stats;
+
+      try {
+         await this.game.save();
+      } catch (err) {
+         console.log(err);
+      }
+   }
+
+   saveUserStats() {}
+
+   updatePayload() {
+      const payload = this.gameState;
+      payload.matchWinner = this.gameState.matchWinner?.username;
+      return payload;
    }
 
    _isLegOver() {
@@ -99,7 +116,11 @@ module.exports = class X01Game {
          this._handleMatchOver();
       } else {
          console.log(
-            'Game shot in leg #' + this.gameState.currentLeg + '. ' + this.gameState.turn + ' to throw first, game on!'
+            'Game shot in leg #' +
+               this.gameState.currentLeg +
+               '. ' +
+               this.gameState.currentPlayer +
+               ' to throw first, game on!'
          );
          // Reset scores for the next leg and increment leg count
          this.gameState.p1Score = this.startingScore;
@@ -117,7 +138,9 @@ module.exports = class X01Game {
          this.gameState.matchWinner = this.p2;
       }
       console.log('Game Over!');
-      console.log('The winner is ' + this.gameState.matchWinner);
+      console.log('The winner is ' + this.gameState.matchWinner.username);
+
+      this.saveGame();
    }
 
    _scoreVisit(data) {
@@ -125,43 +148,37 @@ module.exports = class X01Game {
       if (score > 180 || score < 0) {
          this.error = { msg: 'Score must be in the range of 0-180' };
       } else {
-         if (this.gameState.turn == this.p1) {
-            // this.stats.p1DartsThrown += data.dartsThrown;
-
+         if (this.gameState.currentPlayer == this.p1.username) {
             let remaining = this.gameState.p1Score - score;
 
             if (remaining >= 0) {
                this.stats.p1TotalScored += score;
                this.gameState.p1Score = remaining;
-               console.log('Player ' + this.gameState.turn + ' scored ' + score);
+               console.log('Player ' + this.gameState.currentPlayer + ' scored ' + score);
             } else {
-               console.log('Player ' + this.gameState.turn + ' busted!');
+               console.log('Player ' + this.gameState.currentPlayer + ' busted!');
             }
-            // this.stats.p1ThreeDartAvg = (this.stats.p1TotalScored / this.stats.p1DartsThrown) * 3;
          } else {
-            // this.stats.p2DartsThrown += data.dartsThrown;
-
             let remaining = this.gameState.p2Score - score;
 
             if (remaining >= 0) {
                this.stats.p2TotalScored += score;
                this.gameState.p2Score = remaining;
-               console.log('Player ' + this.gameState.turn + ' scored ' + score);
+               console.log('Player ' + this.gameState.currentPlayer + ' scored ' + score);
             } else {
-               console.log('Player ' + this.gameState.turn + ' busted!');
+               console.log('Player ' + this.gameState.currentPlayer + ' busted!');
             }
-            // this.stats.p1ThreeDartAvg = (this.stats.p1TotalScored / this.stats.p1DartsThrown) * 3;
          }
          this._swapTurns();
       }
    }
 
    _swapTurns() {
-      if (this.gameState.turn == this.p1) {
-         this.gameState.turn = this.p2;
+      if (this.gameState.currentPlayer == this.p1.username) {
+         this.gameState.currentPlayer = this.p2.username;
       } else {
-         this.gameState.turn = this.p1;
+         this.gameState.currentPlayer = this.p1.username;
       }
-      console.log("It's now " + this.gameState.turn + "'s turn");
+      console.log("It's now " + this.gameState.currentPlayer + "'s turn");
    }
 };

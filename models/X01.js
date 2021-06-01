@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const GameResult = require('./GameResult');
+const Game = require('./Game');
 
-const X01ResultSchema = new Schema({
+const X01Schema = new Schema({
    startingScore: {
       type: Number,
       required: true,
@@ -37,7 +37,7 @@ const X01ResultSchema = new Schema({
 });
 
 // Used to get the config for this game easily
-X01ResultSchema.virtual('config').get(function () {
+X01Schema.virtual('config').get(function () {
    return {
       startingScore: this.startingScore,
       numLegsToWin: this.numLegsToWin,
@@ -45,12 +45,12 @@ X01ResultSchema.virtual('config').get(function () {
 });
 
 // Used to get an array of game's players easily
-X01ResultSchema.virtual('players').get(function () {
+X01Schema.virtual('players').get(function () {
    return [this.p1, this.p2];
 });
 
 // Used to get this game's stats easily
-X01ResultSchema.virtual('stats').get(function () {
+X01Schema.virtual('stats').get(function () {
    return {
       p1VisitAvg: this.p1VisitAvg,
       p2VisitAvg: this.p2VisitAvg,
@@ -60,11 +60,11 @@ X01ResultSchema.virtual('stats').get(function () {
 });
 
 // Used to set this game's stats easily
-X01ResultSchema.virtual('stats').set(function (stats) {
+X01Schema.virtual('stats').set(function (stats) {
    this.p1VisitAvg = stats.p1VisitAvg;
    this.p2VisitAvg = stats.p2VisitAvg;
    this.p1TotalScored = stats.p1TotalScored;
    this.p2TotalScored = stats.p2TotalScored;
 });
 
-module.exports = GameResult.discriminator('X01Results', X01ResultSchema);
+module.exports = Game.discriminator('X01', X01Schema);
