@@ -21,8 +21,6 @@ module.exports = class X01Lobby {
          p2Visits: 0,
          p1TotalScored: 0,
          p2TotalScored: 0,
-         p1ThreeDartAvg: 0,
-         p2ThreeDartAvg: 0,
       };
       this.error = null;
    }
@@ -74,6 +72,7 @@ module.exports = class X01Lobby {
       }
    }
 
+   /* TODO: add comment */
    async saveGame() {
       console.log('Saving game...');
       this.game.completed = true;
@@ -82,6 +81,8 @@ module.exports = class X01Lobby {
       this.game.winner = this.gameState.matchWinner;
       this.game.stats = this.stats;
 
+      this._saveUserStats();
+
       try {
          await this.game.save();
       } catch (err) {
@@ -89,8 +90,7 @@ module.exports = class X01Lobby {
       }
    }
 
-   saveUserStats() {}
-
+   /* TODO: add comment */
    updatePayload() {
       const payload = this.gameState;
       payload.matchWinner = this.gameState.matchWinner?.username;
@@ -150,6 +150,7 @@ module.exports = class X01Lobby {
       } else {
          if (this.gameState.currentPlayer == this.p1.username) {
             let remaining = this.gameState.p1Score - score;
+            this.stats.p1Visits++;
 
             if (remaining >= 0) {
                this.stats.p1TotalScored += score;
@@ -160,6 +161,7 @@ module.exports = class X01Lobby {
             }
          } else {
             let remaining = this.gameState.p2Score - score;
+            this.stats.p2Visits++;
 
             if (remaining >= 0) {
                this.stats.p2TotalScored += score;
@@ -180,5 +182,35 @@ module.exports = class X01Lobby {
          this.gameState.currentPlayer = this.p1.username;
       }
       console.log("It's now " + this.gameState.currentPlayer + "'s turn");
+   }
+
+   async _saveUserStats() {
+      const p1 = this.p1;
+      const p2 = this.p2;
+
+      // P1 stats
+      this.p1.totalVisits += this.stats.p1Visits;
+      this.p1.matchesPlayed++;
+      if (this.gameState.matchWinner === this.p1) {
+         this.p1.wins++;
+      } else {
+         this.p1.losses++;
+      }
+
+      // P2 stats
+      this.p2.totalVisits += this.stats.p2Visits;
+      this.p2.matchesPlayed++;
+      if (this.gameState.matchWinner === this.p2) {
+         this.p2.wins++;
+      } else {
+         this.p2.losses++;
+      }
+
+      try {
+         await this.p1.save();
+         await this.p2.save();
+      } catch (err) {
+         console.log(err);
+      }
    }
 };

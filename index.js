@@ -13,10 +13,10 @@ require('./services/passport');
 
 /* Connect to DB */
 mongoose.connect(keys.mongoURI, {
-   useNewUrlParser: true,
-   useUnifiedTopology: true,
-   useFindAndModify: false,
-   useCreateIndex: true,
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useFindAndModify: false,
+	useCreateIndex: true,
 });
 
 /* Import routes */
@@ -27,8 +27,8 @@ const gameRoutes = require('./routes/gameRoutes');
 /* Middleware */
 app.use(express.json());
 const sessionMiddleware = cookieSession({
-   maxAge: 30 * 24 * 60 * 60 * 1000,
-   keys: [keys.cookieKey],
+	maxAge: 30 * 24 * 60 * 60 * 1000,
+	keys: [keys.cookieKey],
 });
 app.use(sessionMiddleware);
 app.use(passport.initialize());
@@ -41,19 +41,21 @@ app.use('/games', gameRoutes);
 
 /* Production logic for serving content (future React frontend) */
 if (process.env.NODE_ENV === 'production') {
-   app.use(express.static('client/build'));
+	app.use(express.static('client/build'));
 
-   // If unknown route, serve index.html
-   // app.get('*', (req, res) => {
-   //    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-   // });
+	// If unknown route, serve index.html
+	// app.get('*', (req, res) => {
+	//    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+	// });
 }
 
 app.get('/', (req, res) => {
-   res.sendFile('E:\\git_workspace\\DartsBuddy\\DartsBuddy\\client\\index.html');
+	res.sendFile('E:\\git_workspace\\DartsBuddy\\DartsBuddy\\client\\index.html');
 });
 
 /* Connect to socket manager */
 require('./sockets/socketService')(server, passport, sessionMiddleware);
 
 server.listen(keys.port);
+
+module.exports = server;
